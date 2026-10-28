@@ -81,10 +81,15 @@ def build_args(op,ref=None,flags=None,store='default'):
             raise ValueError('Disallowed SQL keyword')
         args += [ref]
     elif op not in NO_REF:
-        args += [validate_ref(ref)]
+        valid_ref = validate_ref(ref)
+        if op == 'post' and urlparse(valid_ref).path.startswith('/reel/'):
+            raise ValueError('Reel link detected: choose operation reel (or video), not post')
+        args += [valid_ref]
     elif ref and op=='fields': args += [str(ref)[:100]]
     elif ref and op=='discover': args += []
     for k,v in flags.items():
+        if k == 'about' and v and op not in ('page', 'profile'):
+            raise ValueError('The about option is supported only for page/profile')
         if k in BOOL_FLAGS:
             if not isinstance(v,bool):raise ValueError(f'{k} must be boolean')
             if v: args.append('--'+k)
