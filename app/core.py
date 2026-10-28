@@ -5,7 +5,7 @@ import asyncio, json, os, re, uuid
 from pathlib import Path
 from urllib.parse import urlparse
 
-ROOT=Path('/data')
+ROOT=Path(os.getenv('FIP_DATA_ROOT', '/data'))
 # All read operations from upstream docs /v1/* plus CLI-only capabilities.
 OPS = {
     'page': 'Page/profile information and about tab',
