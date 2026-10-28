@@ -37,3 +37,18 @@ def test_auth_dashboard_and_docs():
         ids=c.get('/admin/api/status').json()['keys']; uid=ids[0]['id']
         assert c.delete('/admin/api/keys/'+uid).status_code==200
         assert c.get('/v1/capabilities',headers=h).status_code==403
+
+
+def test_reel_links_use_reel_command():
+    ref='https://www.facebook.com/reel/3181543935372005/'
+    args=build_args('reel',ref,{'limit':1000})
+    assert args[:3]==['fb','reel',ref]
+    assert args[-4:]==['--limit','1000','--output','jsonl']
+    with pytest.raises(ValueError,match='reel'):
+        build_args('post',ref,{'limit':1000})
+
+
+def test_about_option_only_applies_to_pages():
+    assert '--about' in build_args('page','nasa',{'about':True})
+    with pytest.raises(ValueError,match='about'):
+        build_args('reel','https://www.facebook.com/reel/3181543935372005/',{'about':True})
