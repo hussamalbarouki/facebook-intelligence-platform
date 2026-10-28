@@ -213,6 +213,11 @@ async def worker_loop(stop):
                     else:
                         result=await execute_with_optional_fallback(job.operation,job.ref,job.options.get('flags',{}),aid,job.options.get('store','default'),db)
                     job.result=result;job.status='done'
+                except CLIError as e:
+                    job.status='failed'
+                    # The original engine's sanitized stderr helps diagnose usage failures.
+                    # The upstream engine's source code is unchanged.
+                    job.error=(e.message + (': ' + e.detail.strip() if e.detail.strip() else ''))[:800]
                 except Exception as e:
                     job.status='failed';job.error=str(e)[:400]
                 job.updated_at=now();db.commit()
