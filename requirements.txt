@@ -1,0 +1,9 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+SQLAlchemy==2.0.41
+psycopg[binary]==3.2.9
+cryptography==45.0.4
+playwright==1.54.0
+itsdangerous==2.2.0
+python-multipart==0.0.20
+httpx==0.28.1

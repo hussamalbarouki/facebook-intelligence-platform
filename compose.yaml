@@ -1,0 +1,41 @@
+services:
+  platform:
+    build: .
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://fb:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/fb
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET}
+      SITE_TITLE: ${SITE_TITLE:-Facebook Intelligence Platform}
+    volumes:
+      - platform_data:/data
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+    security_opt:
+      - no-new-privileges:true
+    shm_size: 512mb
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz',timeout=4)"]
+      interval: 30s
+      timeout: 8s
+      retries: 3
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fb
+      POSTGRES_USER: fb
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fb -d fb"]
+      interval: 8s
+      timeout: 5s
+      retries: 8
+volumes:
+  platform_data:
+  postgres_data:
