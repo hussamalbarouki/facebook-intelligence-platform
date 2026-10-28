@@ -17,6 +17,7 @@ jobs:
       - name: Test gateway and API security
         env:
           FIP_TEST: '1'
+          FIP_DATA_ROOT: /tmp/fip-gh-data
           DATABASE_URL: sqlite:////tmp/fip-gh-tests.db
         run: |
           pip install -r requirements.txt pytest
